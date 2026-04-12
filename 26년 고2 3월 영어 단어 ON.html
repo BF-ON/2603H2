@@ -1,0 +1,761 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>ON영어 천안 | 고2 단어 퀴즈</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --green:#1D9E75;--green-light:#E1F5EE;--green-dark:#0F6E56;
+  --blue:#185FA5;--blue-light:#E6F1FB;
+  --red:#E24B4A;--red-light:#FCEBEB;--red-dark:#A32D2D;
+  --bg:#F7F7F5;--surface:#FFFFFF;--text:#1A1A1A;
+  --muted:#6B6B6B;--border:rgba(0,0,0,0.1);--border-s:rgba(0,0,0,0.18);
+  --r:12px;--rs:8px;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding:0 0 80px}
+#app{max-width:460px;margin:0 auto;padding:0 16px}
+
+/* Header */
+.header{display:flex;align-items:center;gap:10px;padding:20px 0 20px}
+.logo{width:38px;height:38px;border-radius:10px;background:var(--green);color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;letter-spacing:-.5px;flex-shrink:0}
+.header-info h1{font-size:16px;font-weight:700}
+.header-info p{font-size:11px;color:var(--muted);margin-top:1px}
+
+/* Grade badge */
+.grade-badge{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;background:var(--blue-light);border-radius:20px;margin-bottom:18px}
+.grade-badge span{font-size:12px;font-weight:700;color:var(--blue)}
+
+/* Section label */
+.label{font-size:11px;font-weight:700;letter-spacing:.8px;color:var(--muted);text-transform:uppercase;margin-bottom:10px}
+
+/* Passage grid */
+.passage-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-bottom:22px}
+.p-btn{padding:11px 4px;border:1px solid var(--border);border-radius:var(--rs);background:var(--surface);font-size:13px;font-weight:500;color:var(--text);cursor:pointer;text-align:center;font-family:'DM Mono',monospace;transition:all .15s}
+.p-btn:active{transform:scale(.95)}
+.p-btn.selected{border:2px solid var(--green);color:var(--green-dark);background:var(--green-light);font-weight:700}
+
+/* Mode buttons */
+.mode-list{display:flex;flex-direction:column;gap:8px;margin-bottom:22px}
+.mode-btn{display:flex;align-items:center;gap:12px;padding:14px 16px;border:1px solid var(--border);border-radius:var(--r);background:var(--surface);cursor:pointer;text-align:left;transition:all .15s}
+.mode-btn:active{transform:scale(.98)}
+.mode-btn.selected{border:2px solid var(--green);background:var(--green-light)}
+.mode-icon{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.mode-title{font-size:14px;font-weight:700;color:var(--text)}
+.mode-desc{font-size:12px;color:var(--muted);margin-top:2px}
+.mode-btn.selected .mode-title{color:var(--green-dark)}
+
+/* Start button */
+.start-btn{width:100%;padding:16px;background:var(--green);color:#fff;border:none;border-radius:var(--r);font-size:16px;font-weight:700;cursor:pointer;font-family:'Noto Sans KR',sans-serif;transition:all .15s;letter-spacing:-.3px}
+.start-btn:hover{background:var(--green-dark)}
+.start-btn:active{transform:scale(.98)}
+.start-btn:disabled{opacity:.35;cursor:not-allowed}
+
+/* Promo banner */
+.promo{margin-top:24px;padding:16px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);display:flex;align-items:center;gap:12px}
+.promo-icon{width:40px;height:40px;border-radius:50%;background:var(--blue-light);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.promo-text{flex:1}
+.promo-title{font-size:13px;font-weight:700;color:var(--text)}
+.promo-sub{font-size:11px;color:var(--muted);margin-top:2px;line-height:1.5}
+.promo-tel{font-size:14px;font-weight:700;color:var(--blue);margin-top:4px;font-family:'DM Mono',monospace}
+
+/* Screens */
+.screen{display:none}
+.screen.active{display:block}
+
+/* Quiz */
+.quiz-header{display:flex;align-items:center;justify-content:space-between;padding:16px 0 14px}
+.back-btn{background:none;border:none;font-size:13px;color:var(--muted);cursor:pointer;padding:4px 0;font-family:'Noto Sans KR',sans-serif}
+.quiz-label{font-size:12px;font-weight:700;color:var(--muted)}
+.progress-bar{width:100%;height:5px;background:var(--border);border-radius:3px;margin-bottom:10px;overflow:hidden}
+.progress-fill{height:100%;background:var(--green);border-radius:3px;transition:width .35s ease}
+.progress-info{display:flex;justify-content:space-between;font-size:12px;color:var(--muted);margin-bottom:20px}
+.score-badge{color:var(--green);font-weight:700}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:28px 24px;text-align:center;margin-bottom:16px;min-height:160px;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:10px}
+.card-tag{font-size:11px;font-weight:700;letter-spacing:.5px;padding:4px 10px;border-radius:20px;background:var(--bg);color:var(--muted)}
+.card-q{font-size:26px;font-weight:700;color:var(--text);line-height:1.3;font-family:'DM Mono',monospace;word-break:break-all}
+.card-q.korean{font-family:'Noto Sans KR',sans-serif;font-size:22px}
+.card-hint{font-size:13px;color:var(--muted)}
+.options-list{display:flex;flex-direction:column;gap:8px;margin-bottom:14px}
+.opt-btn{padding:15px 16px;border:1px solid var(--border);border-radius:var(--rs);background:var(--surface);font-size:15px;color:var(--text);cursor:pointer;text-align:left;transition:all .15s;font-family:'Noto Sans KR',sans-serif;line-height:1.4}
+.opt-btn:hover:not(:disabled){background:var(--bg);border-color:var(--border-s)}
+.opt-btn:active:not(:disabled){transform:scale(.98)}
+.opt-btn.correct{border:2px solid var(--green);background:var(--green-light);color:var(--green-dark);font-weight:700}
+.opt-btn.wrong{border:2px solid var(--red);background:var(--red-light);color:var(--red-dark)}
+.opt-btn:disabled{cursor:default}
+.input-wrap{display:flex;gap:8px;margin-bottom:14px}
+.input-wrap input{flex:1;padding:14px 16px;border:1px solid var(--border-s);border-radius:var(--rs);font-size:16px;background:var(--surface);color:var(--text);font-family:'DM Mono',monospace;outline:none}
+.input-wrap input:focus{border-color:var(--green)}
+.input-wrap button{padding:14px 18px;background:var(--green);color:#fff;border:none;border-radius:var(--rs);font-size:14px;font-weight:700;cursor:pointer;font-family:'Noto Sans KR',sans-serif}
+.reveal{padding:16px;border-radius:var(--rs);margin-bottom:14px;text-align:center}
+.reveal.correct{background:var(--green-light);border:1px solid var(--green)}
+.reveal.wrong{background:var(--red-light);border:1px solid var(--red)}
+.reveal-result{font-size:13px;font-weight:700;margin-bottom:6px}
+.reveal.correct .reveal-result{color:var(--green-dark)}
+.reveal.wrong .reveal-result{color:var(--red-dark)}
+.reveal-en{font-size:20px;font-weight:700;font-family:'DM Mono',monospace;color:var(--text)}
+.reveal-ko{font-size:14px;color:var(--muted);margin-top:4px}
+.reveal-syn{font-size:12px;color:var(--muted);margin-top:4px}
+.reveal-syn span{background:var(--bg);padding:2px 8px;border-radius:10px;font-family:'DM Mono',monospace;font-size:12px}
+.next-btn{width:100%;padding:15px;background:var(--bg);border:1px solid var(--border-s);border-radius:var(--r);font-size:15px;font-weight:700;cursor:pointer;color:var(--text);font-family:'Noto Sans KR',sans-serif;transition:all .15s}
+.next-btn:hover{background:#EBEBEB}
+.next-btn:active{transform:scale(.98)}
+
+/* Result */
+.result-wrap{padding:20px 0}
+.result-header{text-align:center;margin-bottom:24px}
+.result-tag{display:inline-block;font-size:11px;font-weight:700;padding:4px 12px;border-radius:20px;background:var(--green-light);color:var(--green-dark);margin-bottom:10px}
+.result-title{font-size:20px;font-weight:700}
+.result-sub{font-size:13px;color:var(--muted);margin-top:4px}
+.score-ring{width:120px;height:120px;margin:0 auto 24px;position:relative;display:flex;align-items:center;justify-content:center}
+.score-ring svg{position:absolute;top:0;left:0;transform:rotate(-90deg)}
+.score-ring-text{text-align:center;position:relative;z-index:1}
+.score-pct{font-size:30px;font-weight:700;color:var(--green);font-family:'DM Mono',monospace}
+.score-lbl{font-size:11px;color:var(--muted);margin-top:1px}
+.stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:24px}
+.stat-card{padding:16px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);text-align:center}
+.stat-num{font-size:28px;font-weight:700;font-family:'DM Mono',monospace}
+.stat-num.c{color:var(--green)}
+.stat-num.w{color:var(--red)}
+.stat-lbl{font-size:12px;color:var(--muted);margin-top:4px}
+.wrong-title{font-size:13px;font-weight:700;color:var(--muted);margin-bottom:10px}
+.wrong-item{padding:12px 14px;background:var(--surface);border:1px solid var(--border);border-radius:var(--rs);margin-bottom:8px}
+.wrong-en{font-size:15px;font-weight:700;font-family:'DM Mono',monospace;display:flex;align-items:center;gap:6px}
+.wrong-passage{font-size:10px;font-weight:700;padding:2px 6px;border-radius:8px;background:var(--red-light);color:var(--red-dark);font-family:'Noto Sans KR',sans-serif}
+.wrong-ko{font-size:13px;color:var(--muted);margin-top:3px}
+.wrong-syn{font-size:11px;color:var(--muted);margin-top:2px}
+.perfect{text-align:center;padding:24px;background:var(--green-light);border-radius:var(--r);margin-bottom:24px}
+.perfect-icon{font-size:36px;margin-bottom:8px}
+.perfect-text{font-size:15px;font-weight:700;color:var(--green-dark)}
+.btn-retry{width:100%;padding:16px;background:var(--green);color:#fff;border:none;border-radius:var(--r);font-size:16px;font-weight:700;cursor:pointer;font-family:'Noto Sans KR',sans-serif;margin-bottom:10px;transition:all .15s}
+.btn-retry:hover{background:var(--green-dark)}
+.btn-home{width:100%;padding:12px;background:var(--surface);border:1px solid var(--border-s);border-radius:var(--r);font-size:14px;font-weight:700;cursor:pointer;color:var(--text);font-family:'Noto Sans KR',sans-serif;margin-bottom:10px;transition:all .15s}
+.btn-home:hover{background:var(--bg)}
+
+/* Footer promo */
+.footer-promo{margin-top:24px;padding:18px;background:linear-gradient(135deg,#0F6E56 0%,#1D9E75 100%);border-radius:var(--r);color:#fff}
+.footer-promo-top{display:flex;align-items:center;gap:8px;margin-bottom:12px}
+.footer-logo{width:32px;height:32px;border-radius:8px;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700}
+.footer-title{font-size:15px;font-weight:700}
+.footer-sub{font-size:11px;opacity:.8;margin-top:1px}
+.footer-divider{height:1px;background:rgba(255,255,255,.2);margin:12px 0}
+.footer-info-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.footer-info-item{}
+.footer-info-label{font-size:10px;opacity:.7;font-weight:500;letter-spacing:.5px;text-transform:uppercase;margin-bottom:3px}
+.footer-info-val{font-size:13px;font-weight:700;font-family:'DM Mono',monospace}
+.footer-info-val.wide{font-size:11px;font-family:'Noto Sans KR',sans-serif;font-weight:500;opacity:.9;line-height:1.5;grid-column:1/-1}
+.footer-time{font-size:12px;opacity:.85;margin-top:8px;padding:8px;background:rgba(255,255,255,.1);border-radius:var(--rs);text-align:center}
+</style>
+</head>
+<body>
+<div id="app">
+
+<!-- HOME -->
+<div id="home" class="screen active">
+  <div class="header">
+    <div class="logo">ON</div>
+    <div class="header-info">
+      <h1>ON영어 천안 단어 퀴즈</h1>
+      <p>2026년 3월 고2 모의고사</p>
+    </div>
+  </div>
+
+  <div class="grade-badge">
+    <span>📚 고2 단어장 · 20번~40번</span>
+  </div>
+
+  <div class="label">지문 선택 (중복 선택 가능)</div>
+  <div class="passage-grid" id="passageGrid"></div>
+
+  <div class="label">문제 유형</div>
+  <div class="mode-list">
+    <button class="mode-btn selected" data-mode="en-ko" onclick="selectMode(this)">
+      <div class="mode-icon" style="background:#E1F5EE">📖</div>
+      <div>
+        <div class="mode-title">영어 → 한글 (객관식)</div>
+        <div class="mode-desc">영어 단어를 보고 뜻을 선택하세요</div>
+      </div>
+    </button>
+    <button class="mode-btn" data-mode="ko-en" onclick="selectMode(this)">
+      <div class="mode-icon" style="background:#E6F1FB">✏️</div>
+      <div>
+        <div class="mode-title">한글 → 영어 (직접 입력)</div>
+        <div class="mode-desc">한글 뜻을 보고 영어를 직접 입력하세요</div>
+      </div>
+    </button>
+    <button class="mode-btn" data-mode="synonym" onclick="selectMode(this)">
+      <div class="mode-icon" style="background:#FAEEDA">🔗</div>
+      <div>
+        <div class="mode-title">유의어 → 단어 (객관식)</div>
+        <div class="mode-desc">유의어를 보고 알맞은 단어를 선택하세요</div>
+      </div>
+    </button>
+  </div>
+
+  <button class="start-btn" id="startBtn" onclick="startQuiz()" disabled>지문을 선택하세요</button>
+
+  <!-- 홍보 배너 -->
+  <div class="footer-promo">
+    <div class="footer-promo-top">
+      <div class="footer-logo">ON</div>
+      <div>
+        <div class="footer-title">ON영어 천안</div>
+        <div class="footer-sub">고등 내신 · 수능 전문 영어학원</div>
+      </div>
+    </div>
+    <div class="footer-divider"></div>
+    <div class="footer-info-grid">
+      <div class="footer-info-item">
+        <div class="footer-info-label">전화 상담</div>
+        <div class="footer-info-val">041-414-1806</div>
+      </div>
+      <div class="footer-info-item">
+        <div class="footer-info-label">상담 시간</div>
+        <div class="footer-info-val" style="font-family:'Noto Sans KR',sans-serif;font-size:12px">평일 14:00~24:00</div>
+      </div>
+      <div class="footer-info-item footer-info-val wide">
+        <div class="footer-info-label">위치</div>
+        충청남도 천안시 서북구 한들3로 78-23, 2층 202호
+      </div>
+    </div>
+    <div class="footer-time">수업 중 문자를 남겨주시면 확인 후 바로 연락드립니다</div>
+  </div>
+</div>
+
+<!-- QUIZ -->
+<div id="quiz" class="screen">
+  <div class="quiz-header">
+    <button class="back-btn" onclick="goHome()">← 홈</button>
+    <div class="quiz-label" id="quizLabel"></div>
+  </div>
+  <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+  <div class="progress-info">
+    <span id="progressText"></span>
+    <span class="score-badge" id="scoreText"></span>
+  </div>
+  <div class="card" id="questionCard">
+    <div class="card-tag" id="cardTag"></div>
+    <div id="cardQ"></div>
+    <div class="card-hint" id="cardHint"></div>
+  </div>
+  <div id="optionsArea"></div>
+  <div id="revealArea"></div>
+  <button class="next-btn" id="nextBtn" style="display:none" onclick="nextCard()">다음 →</button>
+
+  <!-- 퀴즈 중 작은 홍보 -->
+  <div style="margin-top:20px;padding:12px 14px;background:var(--surface);border:1px solid var(--border);border-radius:var(--rs);display:flex;align-items:center;justify-content:space-between">
+    <div style="font-size:12px;color:var(--muted)">ON영어 천안 | 고등 내신·수능 전문</div>
+    <div style="font-size:12px;font-weight:700;color:var(--blue);font-family:'DM Mono',monospace">041-414-1806</div>
+  </div>
+</div>
+
+<!-- RESULT -->
+<div id="result" class="screen">
+  <div class="result-wrap">
+    <div class="result-header">
+      <div class="result-tag" id="resultTag"></div>
+      <div class="result-title">퀴즈 완료!</div>
+      <div class="result-sub">결과를 확인하세요</div>
+    </div>
+    <div class="score-ring">
+      <svg width="120" height="120" viewBox="0 0 120 120">
+        <circle cx="60" cy="60" r="52" fill="none" stroke="#E1F5EE" stroke-width="10"/>
+        <circle id="scoreArc" cx="60" cy="60" r="52" fill="none" stroke="#1D9E75" stroke-width="10" stroke-linecap="round" stroke-dasharray="327" stroke-dashoffset="327"/>
+      </svg>
+      <div class="score-ring-text">
+        <div class="score-pct" id="scorePct"></div>
+        <div class="score-lbl">정답률</div>
+      </div>
+    </div>
+    <div class="stats-grid">
+      <div class="stat-card"><div class="stat-num c" id="cCount"></div><div class="stat-lbl">정답</div></div>
+      <div class="stat-card"><div class="stat-num w" id="wCount"></div><div class="stat-lbl">오답</div></div>
+    </div>
+    <div id="wrongSection"></div>
+    <button class="btn-retry" onclick="retryQuiz()">🔄 다시 풀기</button>
+    <button class="btn-home" onclick="goHome()">← 지문 다시 선택</button>
+
+    <!-- 결과 화면 홍보 -->
+    <div class="footer-promo" style="margin-top:8px">
+      <div class="footer-promo-top">
+        <div class="footer-logo">ON</div>
+        <div>
+          <div class="footer-title">ON영어 천안</div>
+          <div class="footer-sub">고등 내신 · 수능 전문 영어학원</div>
+        </div>
+      </div>
+      <div class="footer-divider"></div>
+      <div class="footer-info-grid">
+        <div class="footer-info-item">
+          <div class="footer-info-label">전화 상담</div>
+          <div class="footer-info-val">041-414-1806</div>
+        </div>
+        <div class="footer-info-item">
+          <div class="footer-info-label">상담 시간</div>
+          <div class="footer-info-val" style="font-family:'Noto Sans KR',sans-serif;font-size:12px">평일 14:00~24:00</div>
+        </div>
+        <div class="footer-info-item footer-info-val wide">
+          <div class="footer-info-label">위치</div>
+          충청남도 천안시 서북구 한들3로 78-23, 2층 202호
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div>
+
+<script>
+const VOCAB={
+  20:[
+    {en:"master",ko:"~을 숙달하다, ~을 통달하다",syn:"excel at"},
+    {en:"reduce",ko:"~을 줄이다",syn:"decrease"},
+    {en:"distract",ko:"주의를 다른 데로 돌리다",syn:"divert"},
+    {en:"goal",ko:"목표",syn:"objective"},
+    {en:"mistake",ko:"실수",syn:"error"},
+    {en:"focused",ko:"집중하는, 초점을 맞춘",syn:"concentrated"},
+    {en:"lead to",ko:"~로 이어지다",syn:"result in"},
+    {en:"inevitably",ko:"불가피하게, 필연적으로",syn:"unavoidably"},
+    {en:"tough",ko:"힘든, 어려운",syn:"difficult"},
+    {en:"transition",ko:"전환, 이행",syn:"change"},
+    {en:"counterbalance",ko:"~을 상쇄하다",syn:"offset"},
+    {en:"laser-focused",ko:"레이저처럼 집중된",syn:"intensely focused"},
+    {en:"jumping-off point",ko:"출발점, 기점",syn:"starting point"},
+    {en:"network",ko:"네트워크, 관계",syn:"connection"},
+    {en:"shape",ko:"~을 결정짓다",syn:"determine"},
+    {en:"remedy",ko:"해결책, 개선책",syn:"solution"}
+  ],
+  21:[
+    {en:"establish",ko:"~을 구축하다",syn:"build"},
+    {en:"respectful",ko:"존중하는",syn:"considerate"},
+    {en:"acceptance",ko:"수용",syn:"approval"},
+    {en:"obvious",ko:"명백한",syn:"clear"},
+    {en:"misconception",ko:"오개념",syn:"misunderstanding"},
+    {en:"confront",ko:"~에 맞서다",syn:"face"},
+    {en:"willingness",ko:"의지",syn:"readiness"},
+    {en:"incorrect",ko:"틀린",syn:"wrong"},
+    {en:"educator",ko:"교육자",syn:"teacher"},
+    {en:"indicate",ko:"~을 나타내다",syn:"show"},
+    {en:"agreement",ko:"동의함",syn:"consent"},
+    {en:"equip",ko:"~의 능력을 키우다",syn:"prepare"},
+    {en:"defend",ko:"~을 옹호하다",syn:"support"},
+    {en:"solution",ko:"해결책",syn:"answer"},
+    {en:"derogatory",ko:"비하하는",syn:"insulting"}
+  ],
+  22:[
+    {en:"traveler",ko:"여행자",syn:"passenger"},
+    {en:"routine",ko:"절차",syn:"procedure"},
+    {en:"baggage",ko:"짐",syn:"luggage"},
+    {en:"delayed",ko:"지연된",syn:"postponed"},
+    {en:"commuter",ko:"통근자",syn:"regular rider"},
+    {en:"direct",ko:"직접적인",syn:"immediate"},
+    {en:"access",ko:"접근성",syn:"entry"},
+    {en:"separate",ko:"분리된",syn:"divided"},
+    {en:"avoid",ko:"~을 피하다",syn:"prevent"},
+    {en:"conflict",ko:"충돌",syn:"clash"},
+    {en:"confusion",ko:"혼란",syn:"disorder"},
+    {en:"platform",ko:"승강장",syn:"boarding area"},
+    {en:"movement",ko:"이동",syn:"flow"},
+    {en:"desirable",ko:"바람직한",syn:"preferable"},
+    {en:"concise",ko:"간결한",syn:"brief"},
+    {en:"retrieve",ko:"되찾다",syn:"recover"}
+  ],
+  23:[
+    {en:"performance",ko:"공연",syn:"show"},
+    {en:"lighting",ko:"조명",syn:"illumination"},
+    {en:"cue",ko:"신호",syn:"signal"},
+    {en:"trigger",ko:"~을 촉발하다",syn:"activate"},
+    {en:"motivation",ko:"동기 (부여)",syn:"reason"},
+    {en:"obvious",ko:"명확한",syn:"clear"},
+    {en:"rapid",ko:"빠른",syn:"quick"},
+    {en:"intensity",ko:"강도",syn:"strength"},
+    {en:"subtle",ko:"미묘한",syn:"delicate"},
+    {en:"atmosphere",ko:"분위기",syn:"mood"},
+    {en:"motivate",ko:"~에 동기를 부여하다",syn:"inspire"},
+    {en:"dramatic",ko:"극적인",syn:"striking"},
+    {en:"transition",ko:"전환",syn:"shift"},
+    {en:"traditional",ko:"전통적인",syn:"conventional"},
+    {en:"intention",ko:"의도",syn:"purpose"}
+  ],
+  24:[
+    {en:"impose",ko:"~을 …에 부여하다",syn:"apply"},
+    {en:"characteristic",ko:"특성, 특징",syn:"feature"},
+    {en:"remarkable",ko:"놀라운",syn:"extraordinary"},
+    {en:"environment",ko:"환경",syn:"setting"},
+    {en:"playback",ko:"재생",syn:"replay"},
+    {en:"loudspeaker",ko:"스피커",syn:"speaker"},
+    {en:"dramatically",ko:"극적으로",syn:"significantly"},
+    {en:"location",ko:"위치",syn:"position"},
+    {en:"similarly",ko:"유사하게",syn:"likewise"},
+    {en:"record",ko:"~을 녹음하다",syn:"capture"},
+    {en:"instrument",ko:"악기",syn:"musical device"},
+    {en:"acoustical",ko:"음향의",syn:"sonic"}
+  ],
+  25:[
+    {en:"percentage",ko:"비율",syn:"proportion"},
+    {en:"consumer",ko:"소비자",syn:"buyer"},
+    {en:"respond to",ko:"~에 응답하다",syn:"reply to"},
+    {en:"review",ko:"후기",syn:"feedback"},
+    {en:"request",ko:"요청",syn:"ask"},
+    {en:"method",ko:"방법",syn:"approach"},
+    {en:"gap",ko:"격차",syn:"difference"},
+    {en:"increase",ko:"증가하다",syn:"rise"}
+  ],
+  26:[
+    {en:"pursue",ko:"~을 추구하다",syn:"seek"},
+    {en:"academic career",ko:"학업, 학력",syn:"scholarly career"},
+    {en:"earn a degree",ko:"학위를 취득하다",syn:"obtain a degree"},
+    {en:"doctoral degree",ko:"박사 학위",syn:"PhD"},
+    {en:"theory",ko:"이론",syn:"hypothesis"},
+    {en:"evidence",ko:"증거, 근거",syn:"proof"},
+    {en:"accept",ko:"~을 받아들이다",syn:"acknowledge"},
+    {en:"outstanding",ko:"뛰어난, 걸출한",syn:"excellent"},
+    {en:"contribution",ko:"~에 대한 기여",syn:"input"},
+    {en:"mentor",ko:"멘토, 조언자",syn:"guide"},
+    {en:"introduce",ko:"~을 소개하다",syn:"present"},
+    {en:"audience",ko:"시청자",syn:"viewers"}
+  ],
+  27:[
+    {en:"smart farm",ko:"스마트 농장",syn:"tech-based farm"},
+    {en:"participant",ko:"참가자",syn:"attendee"},
+    {en:"track",ko:"~을 추적하다",syn:"monitor"},
+    {en:"crop",ko:"작물",syn:"plant"},
+    {en:"submit",ko:"~을 제출하다",syn:"hand in"},
+    {en:"benefit",ko:"이점, 혜택",syn:"advantage"},
+    {en:"registration",ko:"등록",syn:"enrollment"},
+    {en:"free of charge",ko:"무료로",syn:"at no cost"},
+    {en:"individually",ko:"개별적으로",syn:"separately"}
+  ],
+  28:[
+    {en:"reserve",ko:"~을 예약하다",syn:"book"},
+    {en:"reservation",ko:"예약",syn:"booking"},
+    {en:"condition",ko:"(물건 등의) 상태",syn:"state"},
+    {en:"available",ko:"이용 가능한",syn:"accessible"},
+    {en:"household",ko:"가정용의",syn:"domestic"},
+    {en:"extension",ko:"연장",syn:"prolongation"},
+    {en:"fee",ko:"요금",syn:"charge"},
+    {en:"daily",ko:"매일",syn:"every day"}
+  ],
+  29:[
+    {en:"invent",ko:"~을 발명하다",syn:"create"},
+    {en:"manufacturing",ko:"제조(업)",syn:"production"},
+    {en:"prior to",ko:"~보다 이전에",syn:"before"},
+    {en:"specialist",ko:"전문가",syn:"expert"},
+    {en:"specialize in",ko:"~을 전문으로 하다",syn:"focus on"},
+    {en:"efficiency",ko:"효율성",syn:"productivity"},
+    {en:"quality",ko:"품질",syn:"standard"},
+    {en:"essentially",ko:"기본적으로",syn:"fundamentally"},
+    {en:"improvement",ko:"향상, 개선",syn:"advancement"},
+    {en:"facility",ko:"시설",syn:"premises"},
+    {en:"apprentice",ko:"견습생",syn:"trainee"}
+  ],
+  30:[
+    {en:"doctoral",ko:"박사의",syn:"PhD-level"},
+    {en:"significant",ko:"상당한",syn:"considerable"},
+    {en:"thorough",ko:"철저한",syn:"complete"},
+    {en:"exploration",ko:"탐구",syn:"investigation"},
+    {en:"narrow",ko:"~을 좁히다",syn:"restrict"},
+    {en:"acquire",ko:"~을 얻다",syn:"gain"},
+    {en:"consequently",ko:"결과적으로",syn:"therefore"},
+    {en:"hinder",ko:"~을 저해하다",syn:"impede"},
+    {en:"diverse",ko:"다양한",syn:"varied"},
+    {en:"interdisciplinary",ko:"학제간의",syn:"cross-disciplinary"},
+    {en:"implement",ko:"~을 시행하다",syn:"carry out"},
+    {en:"transferable",ko:"전이 가능한",syn:"adaptable"},
+    {en:"incorporate",ko:"~을 통합하다",syn:"include"},
+    {en:"curriculum",ko:"교육과정",syn:"program"},
+    {en:"breadth",ko:"폭",syn:"range"}
+  ],
+  31:[
+    {en:"imaginary",ko:"상상의",syn:"fictional"},
+    {en:"disrupt",ko:"~을 방해하다",syn:"disturb"},
+    {en:"expression",ko:"표현",syn:"display"},
+    {en:"causal",ko:"인과의",syn:"cause-and-effect"},
+    {en:"pretend",ko:"~을 가장하다",syn:"act as if"},
+    {en:"preschool",ko:"미취학의, 유치원의",syn:"early childhood"},
+    {en:"exhibit",ko:"~을 보이다",syn:"show"},
+    {en:"avoidance",ko:"~에 대한 회피",syn:"evasion"},
+    {en:"emotion",ko:"감정",syn:"feeling"}
+  ],
+  32:[
+    {en:"emerge",ko:"나타나다, 출현하다",syn:"appear"},
+    {en:"liberation",ko:"해방",syn:"freedom"},
+    {en:"aesthetic",ko:"미적인",syn:"artistic"},
+    {en:"ordinary",ko:"평범한",syn:"everyday"},
+    {en:"recognize",ko:"~을 인식하다",syn:"acknowledge"},
+    {en:"degrade",ko:"~을 격하하다",syn:"belittle"},
+    {en:"prevalent",ko:"만연한, 지배적인",syn:"widespread"},
+    {en:"philosophical",ko:"철학적인",syn:"theoretical"},
+    {en:"locate",ko:"~을 찾아내다",syn:"identify"},
+    {en:"contemporary",ko:"현대적인",syn:"modern"},
+    {en:"internalize",ko:"~을 내면화하다",syn:"absorb"},
+    {en:"intensify",ko:"~을 강화시키다",syn:"strengthen"},
+    {en:"gratification",ko:"만족감",syn:"satisfaction"}
+  ],
+  33:[
+    {en:"validly",ko:"타당하게",syn:"reasonably"},
+    {en:"morally",ko:"도덕적으로",syn:"ethically"},
+    {en:"superior",ko:"(~보다) 우월한",syn:"better"},
+    {en:"possess",ko:"~을 소유하다",syn:"have"},
+    {en:"capacity",ko:"능력",syn:"ability"},
+    {en:"moral agent",ko:"도덕적 행위자",syn:"ethical being"},
+    {en:"judgment",ko:"판단",syn:"evaluation"},
+    {en:"superiority",ko:"우월성",syn:"dominance"},
+    {en:"comparative",ko:"비교상의",syn:"relative"},
+    {en:"deficiency",ko:"결함",syn:"weakness"},
+    {en:"fulfill",ko:"~을 충족시키다",syn:"satisfy"},
+    {en:"entity",ko:"존재",syn:"being"}
+  ],
+  34:[
+    {en:"artificial",ko:"인공적인, 인위적인",syn:"man-made"},
+    {en:"filler",ko:"추임새",syn:"padding"},
+    {en:"silence",ko:"침묵",syn:"quiet"},
+    {en:"convince",ko:"~에게 확신시키다",syn:"persuade"},
+    {en:"humanity",ko:"인간다움, 인간성",syn:"human nature"},
+    {en:"interpret",ko:"~을 …으로 해석하다",syn:"understand"},
+    {en:"reinforce",ko:"~을 강화하다",syn:"strengthen"},
+    {en:"illusion",ko:"환상",syn:"false impression"},
+    {en:"inference",ko:"추론",syn:"deduction"},
+    {en:"meaningful",ko:"유의미한",syn:"significant"},
+    {en:"absence",ko:"부재",syn:"lack"},
+    {en:"cadence",ko:"억양",syn:"rhythm"},
+    {en:"equivalent",ko:"상응하는",syn:"corresponding"}
+  ],
+  35:[
+    {en:"standardization",ko:"표준화",syn:"uniformity"},
+    {en:"reproduction",ko:"복제, 재생산",syn:"copy"},
+    {en:"authentic",ko:"진짜의",syn:"genuine"},
+    {en:"exploration",ko:"탐험",syn:"expedition"},
+    {en:"distribute",ko:"~을 배포하다",syn:"spread"},
+    {en:"certainty",ko:"확신, 확실성",syn:"assurance"},
+    {en:"accuracy",ko:"정확성",syn:"precision"},
+    {en:"manuscript",ko:"필사본",syn:"handwritten text"}
+  ],
+  36:[
+    {en:"cultivate",ko:"~을 경작하다",syn:"grow"},
+    {en:"continuous",ko:"지속적인",syn:"ongoing"},
+    {en:"innovation",ko:"혁신",syn:"advancement"},
+    {en:"boost",ko:"~을 끌어올리다",syn:"increase"},
+    {en:"productivity",ko:"생산성",syn:"output"},
+    {en:"reduce",ko:"~을 줄이다",syn:"decrease"},
+    {en:"demand",ko:"수요",syn:"need"},
+    {en:"suitable",ko:"적합한",syn:"appropriate"},
+    {en:"limitation",ko:"제한, 한계",syn:"restriction"},
+    {en:"decline",ko:"감소하다",syn:"decrease"},
+    {en:"topography",ko:"지형",syn:"landscape"}
+  ],
+  37:[
+    {en:"compare",ko:"~을 비교하다",syn:"contrast"},
+    {en:"category",ko:"범주",syn:"group"},
+    {en:"define",ko:"~을 정의하다",syn:"explain"},
+    {en:"terminology",ko:"용어, 어휘 체계",syn:"vocabulary"},
+    {en:"probability",ko:"확률",syn:"likelihood"},
+    {en:"predictable",ko:"예측 가능한",syn:"expected"},
+    {en:"core",ko:"핵심의",syn:"central"},
+    {en:"typically",ko:"일반적으로",syn:"usually"},
+    {en:"modify",ko:"~을 변형하다",syn:"alter"},
+    {en:"kinship",ko:"친족",syn:"family relation"},
+    {en:"typological",ko:"유형학의",syn:"classificatory"}
+  ],
+  38:[
+    {en:"communicate",ko:"~을 전달하다",syn:"convey"},
+    {en:"fictional",ko:"허구의",syn:"imaginary"},
+    {en:"emit",ko:"~을 발산하다",syn:"send out"},
+    {en:"sufficient",ko:"충분한",syn:"enough"},
+    {en:"insufficient",ko:"불충분한",syn:"inadequate"},
+    {en:"maintain",ko:"~을 유지하다",syn:"keep"},
+    {en:"common ground",ko:"공통된 기반",syn:"shared basis"},
+    {en:"confusion",ko:"혼란",syn:"disorder"},
+    {en:"make-believe",ko:"가상 역할 놀이",syn:"pretend play"}
+  ],
+  39:[
+    {en:"pressure",ko:"압력",syn:"force"},
+    {en:"uniformly",ko:"균일하게",syn:"evenly"},
+    {en:"variation",ko:"변화",syn:"change"},
+    {en:"assume",ko:"~라고 가정하다",syn:"suppose"},
+    {en:"reflect",ko:"~을 반영하다",syn:"indicate"},
+    {en:"bias",ko:"편향",syn:"tendency"},
+    {en:"trivial",ko:"미미한, 사소한",syn:"minor"},
+    {en:"enormous",ko:"거대한",syn:"huge"},
+    {en:"essentially",ko:"본질적으로",syn:"fundamentally"},
+    {en:"interior",ko:"내부",syn:"inside"},
+    {en:"intuition",ko:"직관",syn:"instinct"}
+  ],
+  40:[
+    {en:"self-experimentation",ko:"자가 실험",syn:"personal trial"},
+    {en:"conventional",ko:"전통적인",syn:"traditional"},
+    {en:"resemble",ko:"~와 비슷하다",syn:"be similar to"},
+    {en:"convince",ko:"~을 납득시키다",syn:"persuade"},
+    {en:"eliminate",ko:"~을 제거하다",syn:"remove"},
+    {en:"hypothesis",ko:"가설",syn:"assumption"},
+    {en:"exploratory",ko:"탐색적인",syn:"investigative"},
+    {en:"phase",ko:"단계",syn:"stage"},
+    {en:"maximize",ko:"~을 극대화하다",syn:"optimize"},
+    {en:"parameter",ko:"매개 변수",syn:"variable"},
+    {en:"procedural",ko:"절차적인",syn:"systematic"}
+  ]
+};
+
+let selectedPassages=[],selectedMode='en-ko',questions=[],currentIdx=0,correctCount=0,wrongWords=[],answered=false;
+
+function init(){
+  const g=document.getElementById('passageGrid');
+  for(let n=20;n<=40;n++){
+    const b=document.createElement('button');
+    b.className='p-btn';b.textContent=n+'번';b.dataset.n=n;
+    b.onclick=()=>togglePassage(b,n);g.appendChild(b);
+  }
+}
+
+function togglePassage(btn,n){
+  const i=selectedPassages.indexOf(n);
+  if(i===-1){selectedPassages.push(n);btn.classList.add('selected');}
+  else{selectedPassages.splice(i,1);btn.classList.remove('selected');}
+  const sb=document.getElementById('startBtn');
+  if(selectedPassages.length>0){sb.disabled=false;sb.textContent=selectedPassages.length+'개 지문 · 퀴즈 시작';}
+  else{sb.disabled=true;sb.textContent='지문을 선택하세요';}
+}
+
+function selectMode(btn){
+  document.querySelectorAll('.mode-btn').forEach(b=>b.classList.remove('selected'));
+  btn.classList.add('selected');selectedMode=btn.dataset.mode;
+}
+
+function shuffle(arr){
+  const a=[...arr];
+  for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}
+  return a;
+}
+
+function startQuiz(){
+  let pool=[];
+  selectedPassages.sort((a,b)=>a-b).forEach(n=>{if(VOCAB[n])pool=pool.concat(VOCAB[n].map(w=>({...w,passage:n})));});
+  questions=shuffle(pool);currentIdx=0;correctCount=0;wrongWords=[];
+  showScreen('quiz');renderQuestion();
+}
+
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');window.scrollTo(0,0);
+}
+
+function getModeLabel(){return{'en-ko':'영→한','ko-en':'한→영','synonym':'유의어'}[selectedMode]||'';}
+
+function renderQuestion(){
+  const q=questions[currentIdx],total=questions.length;
+  const pct=Math.round((currentIdx/total)*100);
+  document.getElementById('progressFill').style.width=pct+'%';
+  document.getElementById('progressText').textContent=(currentIdx+1)+' / '+total;
+  document.getElementById('scoreText').textContent='✓ '+correctCount;
+  document.getElementById('quizLabel').textContent=q.passage+'번 · '+getModeLabel();
+  document.getElementById('revealArea').innerHTML='';
+  document.getElementById('nextBtn').style.display='none';
+  answered=false;
+  const cq=document.getElementById('cardQ');
+  if(selectedMode==='en-ko'){
+    document.getElementById('cardTag').textContent='영어 → 한글';
+    cq.className='card-q';cq.textContent=q.en;
+    document.getElementById('cardHint').textContent='알맞은 뜻을 선택하세요';
+    renderMCQ(q,'ko');
+  }else if(selectedMode==='ko-en'){
+    document.getElementById('cardTag').textContent='한글 → 영어';
+    cq.className='card-q korean';cq.textContent=q.ko;
+    document.getElementById('cardHint').textContent='영어 단어를 입력하세요';
+    renderInput(q);
+  }else{
+    document.getElementById('cardTag').textContent='유의어 → 단어';
+    cq.className='card-q';cq.textContent=q.syn;
+    document.getElementById('cardHint').textContent='이 유의어에 해당하는 단어를 고르세요';
+    renderMCQ(q,'en');
+  }
+}
+
+function getDistractors(correct,field,count){
+  const pool=[];
+  selectedPassages.forEach(n=>{if(VOCAB[n])VOCAB[n].forEach(w=>{if(w[field]!==correct[field])pool.push(w[field]);});});
+  const unique=[...new Set(pool)];return shuffle(unique).slice(0,count);
+}
+
+function renderMCQ(q,answerField){
+  const correct=q[answerField],distractors=getDistractors(q,answerField,3);
+  while(distractors.length<3)distractors.push('—');
+  const opts=shuffle([correct,...distractors.slice(0,3)]);
+  const area=document.getElementById('optionsArea');area.innerHTML='';
+  const list=document.createElement('div');list.className='options-list';
+  opts.forEach(opt=>{
+    const btn=document.createElement('button');btn.className='opt-btn';btn.textContent=opt;
+    btn.onclick=()=>checkMCQ(btn,opt,correct,q,list);list.appendChild(btn);
+  });area.appendChild(list);
+}
+
+function checkMCQ(btn,selected,correct,q,list){
+  if(answered)return;answered=true;
+  list.querySelectorAll('.opt-btn').forEach(b=>{b.disabled=true;if(b.textContent===correct)b.classList.add('correct');});
+  const isCorrect=selected===correct;
+  if(!isCorrect){btn.classList.add('wrong');wrongWords.push(q);}else correctCount++;
+  showReveal(q,isCorrect);
+}
+
+function renderInput(q){
+  const area=document.getElementById('optionsArea');
+  area.innerHTML=`<div class="input-wrap"><input type="text" id="enInput" placeholder="영어 단어 입력..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/><button onclick="checkInput()">확인</button></div>`;
+  const inp=document.getElementById('enInput');
+  inp.addEventListener('keydown',e=>{if(e.key==='Enter')checkInput();});
+  setTimeout(()=>inp&&inp.focus(),150);
+}
+
+function checkInput(){
+  if(answered)return;
+  const q=questions[currentIdx];
+  const val=(document.getElementById('enInput').value||'').trim().toLowerCase();
+  const correct=q.en.toLowerCase();
+  answered=true;
+  const isCorrect=val===correct;
+  if(isCorrect)correctCount++;else wrongWords.push(q);
+  document.getElementById('enInput').disabled=true;
+  document.querySelector('.input-wrap button').disabled=true;
+  showReveal(q,isCorrect);
+}
+
+function showReveal(q,isCorrect){
+  const rev=document.getElementById('revealArea');
+  rev.innerHTML=`<div class="reveal ${isCorrect?'correct':'wrong'}">
+    <div class="reveal-result">${isCorrect?'✓ 정답!':'✗ 오답'}</div>
+    <div class="reveal-en">${q.en}</div>
+    <div class="reveal-ko">${q.ko}</div>
+    <div class="reveal-syn">유의어 <span>${q.syn}</span></div>
+  </div>`;
+  const nb=document.getElementById('nextBtn');nb.style.display='block';
+  nb.textContent=currentIdx<questions.length-1?'다음 →':'결과 보기';
+}
+
+function nextCard(){currentIdx++;if(currentIdx>=questions.length)showResult();else renderQuestion();}
+
+function showResult(){
+  showScreen('result');
+  const total=questions.length,pct=Math.round((correctCount/total)*100);
+  document.getElementById('resultTag').textContent=selectedPassages.sort((a,b)=>a-b).join(', ')+'번 | '+getModeLabel();
+  document.getElementById('scorePct').textContent=pct+'%';
+  document.getElementById('cCount').textContent=correctCount;
+  document.getElementById('wCount').textContent=total-correctCount;
+  setTimeout(()=>{
+    const arc=document.getElementById('scoreArc');
+    arc.style.transition='stroke-dashoffset 1s ease';
+    arc.style.strokeDashoffset=327-(pct/100)*327;
+  },100);
+  const ws=document.getElementById('wrongSection');
+  if(wrongWords.length===0){
+    ws.innerHTML=`<div class="perfect"><div class="perfect-icon">🎉</div><div class="perfect-text">모두 정답! 완벽합니다!</div></div>`;
+  }else{
+    ws.innerHTML=`<div style="margin-bottom:24px"><div class="wrong-title">틀린 단어 (${wrongWords.length}개)</div>${wrongWords.map(w=>`<div class="wrong-item"><div class="wrong-en">${w.en}<span class="wrong-passage">${w.passage}번</span></div><div class="wrong-ko">${w.ko}</div><div class="wrong-syn">유의어: ${w.syn}</div></div>`).join('')}</div>`;
+  }
+}
+
+function retryQuiz(){startQuiz();}
+function goHome(){showScreen('home');}
+init();
+</script>
+</body>
+</html>
