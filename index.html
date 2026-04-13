@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <title>ON영어 천안 | 고2 단어 퀴즈</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://code.responsivevoice.org/responsivevoice.js?key=FREE"></script>
 <style>
 :root {
   --green:#1D9E75;--green-light:#E1F5EE;--green-dark:#0F6E56;
@@ -147,6 +148,9 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
 .footer-info-val{font-size:13px;font-weight:700;font-family:'DM Mono',monospace}
 .footer-info-val.wide{font-size:11px;font-family:'Noto Sans KR',sans-serif;font-weight:500;opacity:.9;line-height:1.5;grid-column:1/-1}
 .footer-time{font-size:12px;opacity:.85;margin-top:8px;padding:8px;background:rgba(255,255,255,.1);border-radius:var(--rs);text-align:center}
+.tts-btn{display:inline-flex;align-items:center;gap:5px;padding:6px 14px;background:var(--surface);border:1px solid var(--border-s);border-radius:20px;font-size:13px;font-weight:500;color:var(--text-muted);cursor:pointer;font-family:'Noto Sans KR',sans-serif;transition:all .15s;margin-top:6px}
+.tts-btn:hover{background:var(--bg);color:var(--text)}.tts-btn:active{transform:scale(.95)}
+.tts-btn.speaking{color:var(--green-dark);border-color:var(--green);background:var(--green-light)}
 </style>
 </head>
 <body>
@@ -657,7 +661,7 @@ function renderQuestion(){
   if(selectedMode==='en-ko'){
     document.getElementById('cardTag').textContent='영어 → 한글';
     cq.className='card-q';cq.textContent=q.en;
-    document.getElementById('cardHint').textContent='알맞은 뜻을 선택하세요';
+    document.getElementById('cardHint').innerHTML='알맞은 뜻을 선택하세요 &nbsp;<button class="tts-btn" onclick="speak(\''+q.en.replace(/'/g,"\\'")+'\')" >🔊 듣기</button>';
     renderMCQ(q,'ko');
   }else if(selectedMode==='ko-en'){
     document.getElementById('cardTag').textContent='한글 → 영어';
@@ -667,7 +671,7 @@ function renderQuestion(){
   }else{
     document.getElementById('cardTag').textContent='유의어 → 단어';
     cq.className='card-q';cq.textContent=q.syn;
-    document.getElementById('cardHint').textContent='이 유의어에 해당하는 단어를 고르세요';
+    document.getElementById('cardHint').innerHTML='이 유의어에 해당하는 단어를 고르세요 &nbsp;<button class="tts-btn" onclick="speak(\''+q.syn.replace(/'/g,"\\'")+'\')" >🔊 듣기</button>';
     renderMCQ(q,'en');
   }
 }
@@ -723,12 +727,28 @@ function showReveal(q,isCorrect){
   const rev=document.getElementById('revealArea');
   rev.innerHTML=`<div class="reveal ${isCorrect?'correct':'wrong'}">
     <div class="reveal-result">${isCorrect?'✓ 정답!':'✗ 오답'}</div>
-    <div class="reveal-en">${q.en}</div>
+    <div class="reveal-en">${q.en} <button class="tts-btn" onclick="speak('${q.en.replace(/'/g,"\\'")}')">🔊</button></div>
     <div class="reveal-ko">${q.ko}</div>
     <div class="reveal-syn">유의어 <span>${q.syn}</span></div>
   </div>`;
   const nb=document.getElementById('nextBtn');nb.style.display='block';
   nb.textContent=currentIdx<questions.length-1?'다음 →':'결과 보기';
+}
+
+function speak(text){
+  const btns=document.querySelectorAll('.tts-btn');
+  btns.forEach(b=>b.classList.remove('speaking'));
+  btns.forEach(b=>{if(b.textContent.includes('🔊'))b.classList.add('speaking');});
+  if(window.responsiveVoice){
+    responsiveVoice.speak(text,'US English Female',{rate:0.9,onend:()=>{btns.forEach(b=>b.classList.remove('speaking'));}});
+  }else{
+    if(!window.speechSynthesis)return;
+    window.speechSynthesis.cancel();
+    const u=new SpeechSynthesisUtterance(text);
+    u.lang='en-US';u.rate=0.9;
+    u.onend=()=>{btns.forEach(b=>b.classList.remove('speaking'));};
+    window.speechSynthesis.speak(u);
+  }
 }
 
 function nextCard(){currentIdx++;if(currentIdx>=questions.length)showResult();else renderQuestion();}
